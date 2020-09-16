@@ -1,6 +1,8 @@
 import Fuse from 'fuse.js'
 import { readable, writable, derived, get } from 'svelte/store'
 
+export const isFirstRun = writable(true)
+
 const queryParams = new URLSearchParams(window.location.search)
 
 export const libraryStore = writable({
@@ -13,11 +15,11 @@ export const currThemeIndex = writable((queryParams.get('t') !== null) ? parseIn
 export const currTheme = derived([libraryStore, currThemeIndex], ([$libraryStore, $currThemeIndex]) => $libraryStore.siteData[$currThemeIndex])
 
 export const comparisons = readable([
-    {short: '<', label: 'is less than', fn: (a, b) => (a && a !== null) && ((typeof a === 'string') ? a < b : a < parseInt(b)) },
-    {short: '>', label: 'is greater than', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a > b : a > parseInt(b)) },
-    {short: '=', label: 'is equal to', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a === b : a === parseInt(b)) },
-    {short: 'contains', label: 'contains', fn: (a, b) => (a && a !== null) && (a.toString().includes(b.toString())) },
-    {short: "doesn't contain", label: "doesn't contain", fn: (a, b) => (a && a !== null) && (!a.toString().includes(b.toString())) },
+    {short: '<', label: 'is less than', uri: 'lt', fn: (a, b) => (a && a !== null) && ((typeof a === 'string') ? a < b : a < parseInt(b)) },
+    {short: '>', label: 'is greater than', uri: 'gt', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a > b : a > parseInt(b)) },
+    {short: '=', label: 'is equal to', uri: 'eq', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a === b : a === parseInt(b)) },
+    {short: 'contains', label: 'contains', uri: 'c', fn: (a, b) => (a && a !== null) && (a.toString().includes(b.toString())) },
+    {short: "doesn't contain", label: "doesn't contain", uri: 'dc', fn: (a, b) => (a && a !== null) && (!a.toString().includes(b.toString())) },
 ])
 
 export const filters = writable([])
@@ -34,15 +36,15 @@ const fuseOptions = {
 const fuse = derived([libraryStore], ([$libraryStore]) => new Fuse($libraryStore.books, fuseOptions))
 export const search = writable((queryParams.get('s') !== null) ? decodeURIComponent(queryParams.get('s')) : '')
 
-export const filteredBooks = derived([libraryStore, currThemeIndex, fuse, filters, search], ([$libraryStore, $currThemeIndex, $fuse, $filters, $search]) => {
+export const filteredBooks = derived([libraryStore, currThemeIndex, fuse, filters, search, isFirstRun], ([$libraryStore, $currThemeIndex, $fuse, $filters, $search, $isFirstRun]) => {
     const searchResults = ($search) ? $fuse.search($search).map(res => res.item) : $libraryStore.books
 
     // Side effect alert: using this derived opportunity to also update the site's query params
     setQueryParams({   
         s: $search,
         t: $currThemeIndex,
-        f: $filters.map(({ prop, comparison: { short }, value}) => [prop, short, value].join('-')).join('--')
-    })
+        f: $filters.map(({ prop, comparison: { uri }, value}) => [prop, uri, value].join('-')).join('--')
+    }, $isFirstRun)
 
     let filteredResults = ($libraryStore.siteData.length > 0)
         ? filterResults(searchResults, $filters,
@@ -64,14 +66,14 @@ function filterResults(results, filters, propHooks) {
         }))
 }
 
-function setQueryParams(state) {
+function setQueryParams(state, isFirstRun) {
     for (const [key, value] of Object.entries(state)) {
         if (value) {
             queryParams.set(key, encodeURIComponent(value))
-        } else {
+        } else if (!isFirstRun || key !== 'f') {
             queryParams.delete(key)
         }
     }
 
-    history.replaceState(null, null, "?"+queryParams.toString());
+    history.replaceState(null, null, (Array.from(queryParams).length) ? ("?"+queryParams.toString()) : '/');
 }

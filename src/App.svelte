@@ -4,7 +4,9 @@
 
 <script>
     import { onMount } from 'svelte'
-    import { libraryStore, currTheme, filteredBooks } from './stores.js'
+    import { get } from 'svelte/store'
+    import { camelToTitleCase } from './functions/stringFns.js'
+    import { libraryStore, currTheme, filters, filteredBooks, comparisons, isFirstRun } from './stores.js'
     import Helmet from './components/Helmet.svelte'
     import Navbar from './components/Navbar.svelte'
     import Book from './components/Book.svelte' 
@@ -24,6 +26,26 @@
             console.log('libraryData = ', libraryData)
             $libraryStore = libraryData
         }
+
+        const queryParams = new URLSearchParams(window.location.search)
+        if (queryParams.get('f') !== null) {
+            $filters = decodeURIComponent(queryParams.get('f')).split('--').map(fStr => {
+                const filterArr = fStr.split('-')
+                const prop = get(currTheme).filterFields.split(',').find(field => field.trim() === filterArr[0]).trim()
+
+                console.log(`"${ prop }"`)
+
+                return {
+                    uid: Math.random().toString(36).slice(2,9),
+                    prop,
+                    label: camelToTitleCase(prop),
+                    comparison: get(comparisons).find(c => c.uri === filterArr[1]),
+                    value: filterArr[2],
+                }
+            })
+        }
+
+        $isFirstRun = false
     })
 
     $: featuredBook = libraryData.books.find(book => book.title === $currTheme.featuredBook)

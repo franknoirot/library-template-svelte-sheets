@@ -3,8 +3,6 @@ require('isomorphic-fetch')
 const parse = require('csv-parse')
 
 exports.handler = async (event, context, callback) => {
-    console.log('fucking landed!')
-
     const fetchPromises = () => ([
         fetch('https://' + process.env.THEME_SHEET),
         fetch('https://' + process.env.BOOKS_SHEET),

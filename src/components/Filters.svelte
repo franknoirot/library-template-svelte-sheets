@@ -33,7 +33,11 @@
 </script>
 
 <div class='lib-control filters'>
-    <button id='toggle-filters' class='toggle' class:active={ active } on:click>Filters</button>
+    <button id='toggle-filters' class='toggle' class:active={ active } on:click>
+        {#if $filters.length > 0}
+        <strong>{ $filters.length} </strong>
+        {/if}
+        Filters</button>
     <div class='filters-inner'>
         <form id='filter-add-form' on:submit={ addFilter }>
             <select id='filter-param-dropdown'>
