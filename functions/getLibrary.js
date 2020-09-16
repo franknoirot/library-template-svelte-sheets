@@ -31,7 +31,7 @@ exports.handler = async (event,context, callback) => {
             callback(err, {
                 statusCode: 502,
                 headers: {
-                    'Access-Control-Allow-Origin': '*'
+                    'Access-Control-Allow-Origin': '*',
                 },
                 body: JSON.stringify(err)
             })
@@ -40,7 +40,8 @@ exports.handler = async (event,context, callback) => {
     callback(null, {
         statusCode: 200,
         headers: {
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
         },
         body: JSON.stringify(data)
     })
