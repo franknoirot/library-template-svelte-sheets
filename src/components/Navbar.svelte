@@ -44,7 +44,7 @@
             <fieldset class='theme-picker'>
                 {#each $libraryStore.siteData as theme, i (`theme-${ i }`) }
                 <div>
-                    <input id='theme-{ i }' type='radio' name='themes' value='{ i }' checked={ i === 0 } on:input={() => $currThemeIndex = i}>
+                    <input id='theme-{ i }' type='radio' name='themes' value='{ i }' checked={ i === $currThemeIndex } on:input={() => $currThemeIndex = i}>
                     <label for='theme-{ i }'>{ theme.themeName }</label> 
                 </div>
                 {/each}

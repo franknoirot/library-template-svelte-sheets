@@ -38,13 +38,11 @@ export const filteredBooks = derived([libraryStore, currThemeIndex, fuse, filter
     const searchResults = ($search) ? $fuse.search($search).map(res => res.item) : $libraryStore.books
 
     // Side effect alert: using this derived opportunity to also update the site's query params
-    const newParams = {}
-    if ($search) { newParams.s = $search }
-    if ($currThemeIndex) { newParams.t = $currThemeIndex }
-    if ($filters.length) { newParams.f = $filters.map(({ prop, comparison: { short }, value}) => [prop, short, value].join('-')).join('--') }
-    if (Object.keys(newParams).length) {
-        setQueryParams(newParams)
-    }
+    setQueryParams({   
+        s: $search,
+        t: $currThemeIndex,
+        f: $filters.map(({ prop, comparison: { short }, value}) => [prop, short, value].join('-')).join('--')
+    })
 
     let filteredResults = ($libraryStore.siteData.length > 0)
         ? filterResults(searchResults, $filters,
@@ -68,7 +66,11 @@ function filterResults(results, filters, propHooks) {
 
 function setQueryParams(state) {
     for (const [key, value] of Object.entries(state)) {
-        queryParams.set(key, encodeURIComponent(value))
+        if (value) {
+            queryParams.set(key, encodeURIComponent(value))
+        } else {
+            queryParams.delete(key)
+        }
     }
 
     history.replaceState(null, null, "?"+queryParams.toString());
