@@ -8,7 +8,7 @@ const fetchPromises = [
 ]
 
 exports.handler = async (event,context, callback) => {
-    const data = await Promise.all(fetchPromises).then(responses => responses.map(res => res.text()))
+    const data = await Promise.all(fetchPromises).then(responses => responses.map(res => res.clone().text()))
             .then(csvPromises => Promise.all(csvPromises).then(async csvData => {
                 let [siteData, books] = (await Promise.all(csvData.map(csv => parseStreamPromise(csv))))
                     .map(dataArr => dataArr.map(strToBool))
