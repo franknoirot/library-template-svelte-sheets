@@ -4,7 +4,6 @@
 
 <script>
     import { onMount } from 'svelte'
-    import getLibrary from './functions/library.js'
     import { libraryStore, currTheme, filteredBooks } from './stores.js'
     import Helmet from './components/Helmet.svelte'
     import Navbar from './components/Navbar.svelte'
