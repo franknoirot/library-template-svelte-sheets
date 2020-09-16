@@ -520,7 +520,7 @@ button:hover {
     font-size: .9rem;
     border: none;
     border-bottom: solid 1px var(--textColor);
-    background: transparent;
+    background: var(--backgroundColor);
     font-size: inherit;
     color: var(--textColor);
 }

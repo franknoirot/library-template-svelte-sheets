@@ -3,12 +3,14 @@ require('isomorphic-fetch')
 const parse = require('csv-parse')
 
 exports.handler = async (event, context, callback) => {
+    console.log('fucking landed!')
+
     const fetchPromises = () => ([
         fetch('https://' + process.env.THEME_SHEET),
         fetch('https://' + process.env.BOOKS_SHEET),
     ])
 
-    const data = await Promise.all(fetchPromises()).then(responses => responses.map(res => res.clone().text()))
+    const data = await Promise.all(fetchPromises()).then(responses => responses.map(res => res.text()))
             .then(csvPromises => Promise.all(csvPromises).then(async csvData => {
                 let [siteData, books] = (await Promise.all(csvData.map(csv => parseStreamPromise(csv))))
                     .map(dataArr => dataArr.map(strToBool))
@@ -28,21 +30,22 @@ exports.handler = async (event, context, callback) => {
             })
         ).catch(err => {
             console.error(err)
-            callback(err, {
+            callback(JSON.stringify(err), {
                 statusCode: 502,
-                headers: {
+                headers: JSON.stringify({
                     'Access-Control-Allow-Origin': '*',
-                },
+                    'Content-Type': 'application/json',
+                }),
                 body: JSON.stringify(err)
             })
         })
 
     callback(null, {
         statusCode: 200,
-        headers: {
-            "Access-Control-Allow-Origin": "*",
-            "Content-Type": "application/json",
-        },
+        headers: JSON.stringify({
+            'Access-Control-Allow-Origin': '*',
+            'Content-Type': 'application/json',
+        }),
         body: JSON.stringify(data),
     })
 }

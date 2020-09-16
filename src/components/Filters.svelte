@@ -1,5 +1,5 @@
 <script>
-    import { currTheme, filters } from '../stores.js'
+    import { currTheme, filters, comparisons } from '../stores.js'
     import { camelToTitleCase } from '../functions/stringFns.js'
 
     export let active = false
@@ -10,14 +10,6 @@
         }
     })
 
-    const comparisons = [
-        {short: '<', label: 'is less than', fn: (a, b) => (a && a !== null) && ((typeof a === 'string') ? a < b : a < parseInt(b)) },
-        {short: '>', label: 'is greater than', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a > b : a > parseInt(b)) },
-        {short: '=', label: 'is equal to', fn: (a, b) =>  (a && a !== null) && ((typeof a === 'string') ? a === b : a === parseInt(b)) },
-        {short: 'contains', label: 'contains', fn: (a, b) => (a && a !== null) && (a.toString().includes(b.toString())) },
-        {short: "doesn't contain", label: "doesn't contain", fn: (a, b) => (a && a !== null) && (!a.toString().includes(b.toString())) },
-    ]
-
     function addFilter(e) {
         e.preventDefault()
 
@@ -27,7 +19,7 @@
             {
                 uid: Math.random().toString(36).slice(2,9),
                 ...filterParams.find(f => f.prop === filterVals[0]),
-                comparison: comparisons.find(c => c.short === filterVals[1]),
+                comparison: $comparisons.find(c => c.short === filterVals[1]),
                 value: filterVals[2],
             },
             ...$filters
@@ -50,7 +42,7 @@
                 {/each}
             </select>
             <select id='filter-comp-dropdown'>
-                {#each comparisons as comp, j ('comparison-'+j)}
+                {#each $comparisons as comp, j ('comparison-'+j)}
                 <option value={comp.short}>{ comp.label }</option>
                 {/each}
             </select>

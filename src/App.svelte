@@ -15,8 +15,8 @@
     onMount(async () => {
         if (isLive) {
             console.log(`Doin' it live!`)
-            libraryData = await fetch(((isDev) ? 'https://bookshelf-network-svelte-sheets.netlify.app' : '') + '/.netlify/functions/getLibrary', {
-                method: 'POST',
+            libraryData = await fetch(((isDev) ? 'http://localhost:8888' : '') + '/.netlify/functions/getLibrary', {
+                method: 'GET',
                 headers: {
                     'Accept': 'application/json',
                 }
