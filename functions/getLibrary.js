@@ -2,13 +2,13 @@ const path = require('path')
 require('isomorphic-fetch')
 const parse = require('csv-parse')
 
-const fetchPromises = [
-    fetch('https://' + process.env.THEME_SHEET),
-    fetch('https://' + process.env.BOOKS_SHEET),
-]
-
 exports.handler = async (event,context, callback) => {
-    const data = await Promise.all(fetchPromises).then(responses => responses.map(res => res.clone().text()))
+    const fetchPromises = () => ([
+        fetch('https://' + process.env.THEME_SHEET),
+        fetch('https://' + process.env.BOOKS_SHEET),
+    ])
+
+    const data = await Promise.all(fetchPromises()).then(responses => responses.map(res => res.clone().text()))
             .then(csvPromises => Promise.all(csvPromises).then(async csvData => {
                 let [siteData, books] = (await Promise.all(csvData.map(csv => parseStreamPromise(csv))))
                     .map(dataArr => dataArr.map(strToBool))
