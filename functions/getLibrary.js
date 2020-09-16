@@ -8,7 +8,7 @@ const fetchPromises = [
 ]
 
 exports.handler = async (event,context, callback) => {
-    const data = Promise.all(fetchPromises).then(responses => responses.map(res => res.text()))
+    const data = await Promise.all(fetchPromises).then(responses => responses.map(res => res.text()))
             .then(csvPromises => Promise.all(csvPromises).then(async csvData => {
                 let [siteData, books] = (await Promise.all(csvData.map(csv => parseStreamPromise(csv))))
                     .map(dataArr => dataArr.map(strToBool))
@@ -20,8 +20,6 @@ exports.handler = async (event,context, callback) => {
 
                     books = books.sort((bookA, bookB) => filterArticles(bookA.title) > filterArticles(bookB.title) ? 1 : -1)
                 }
-
-                console.log('from within fetching promise', siteData, books)
 
                 return { 
                     siteData,
@@ -38,8 +36,6 @@ exports.handler = async (event,context, callback) => {
                 body: JSON.stringify(err)
             })
         })
-
-    console.log('from after data fetching', data)
 
     callback(null, {
         statusCode: 200,
