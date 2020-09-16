@@ -3,12 +3,22 @@
 </script>
 
 <script>
+    import { onMount } from 'svelte'
+    import getLibrary from './functions/library.js'
     import { libraryStore, currTheme, filteredBooks } from './stores.js'
     import Helmet from './components/Helmet.svelte'
     import Navbar from './components/Navbar.svelte'
     import Book from './components/Book.svelte' 
     export let isLive = false
-	$libraryStore = libraryData
+    $libraryStore = libraryData
+    
+    onMount(async () => {
+        if (isLive) {
+            console.log(`It's alive!!!!`)
+            libraryData = await fetch('/.netlify/functions/getLibrary')
+            $libraryStore = libraryData
+        }
+    })
 
     $: featuredBook = libraryData.books.find(book => book.title === $currTheme.featuredBook)
 </script>
