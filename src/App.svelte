@@ -9,12 +9,14 @@
     import Navbar from './components/Navbar.svelte'
     import Book from './components/Book.svelte' 
     export let isLive = false
+    export let isDev = false
     $libraryStore = libraryData
     
     onMount(async () => {
         if (isLive) {
             console.log(`It's alive!!!!`)
-            libraryData = await fetch('/.netlify/functions/getLibrary')
+            libraryData = await fetch(((isDev) ? 'https://bookshelf-network-svelte-sheets.netlify.app' : '') + '/.netlify/functions/getLibrary').then(res => res.json())
+            console.log('libraryData = ', libraryData)
             $libraryStore = libraryData
         }
     })
