@@ -2,7 +2,7 @@ const path = require('path')
 require('isomorphic-fetch')
 const parse = require('csv-parse')
 
-exports.handler = async (event,context, callback) => {
+exports.handler = async (event, context, callback) => {
     const fetchPromises = () => ([
         fetch('https://' + process.env.THEME_SHEET),
         fetch('https://' + process.env.BOOKS_SHEET),
@@ -40,10 +40,10 @@ exports.handler = async (event,context, callback) => {
     callback(null, {
         statusCode: 200,
         headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Content-Type': 'application/json',
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
     })
 }
 
