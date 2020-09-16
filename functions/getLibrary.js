@@ -21,6 +21,8 @@ exports.handler = async (event,context, callback) => {
                     books = books.sort((bookA, bookB) => filterArticles(bookA.title) > filterArticles(bookB.title) ? 1 : -1)
                 }
 
+                console.log('from within fetching promise', siteData, books)
+
                 return { 
                     siteData,
                     books,
@@ -36,6 +38,8 @@ exports.handler = async (event,context, callback) => {
                 body: JSON.stringify(err)
             })
         })
+
+    console.log('from after data fetching', data)
 
     callback(null, {
         statusCode: 200,
