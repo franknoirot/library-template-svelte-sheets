@@ -75,5 +75,5 @@ function setQueryParams(state, isFirstRun) {
         }
     }
 
-    history.replaceState(null, null, (Array.from(queryParams).length) ? ("?"+queryParams.toString()) : '/');
+    history.replaceState(null, null, location.pathname + ((Array.from(queryParams).length) ? ("?"+queryParams.toString()) : ''));
 }
